@@ -1,0 +1,29 @@
+<center><h1>ChatBox</h1></center>
+<textarea id="display" rows="20" cols="165" readonly></textarea><br><br>
+
+<script>
+
+    var ws = new WebSocket('ws://127.0.0.1:8000/wt/{{data}}')
+
+    ws.onopen = function(){
+        console.log('this is connect')
+    }
+
+    ws.onmessage = function(event){
+        console.log('Message recived from ws', event)
+        document.getElementById('display').value += event.data +'\n'
+    }
+    ws.onerror = function(event){
+        console.log('Error is occured..', event)
+    }
+    ws.onclose = function(event){
+        console.log('Connection is closed..', event)
+    }
+    function fun() {
+        var msg= document.getElementById("yoyo").value;
+        ws.send(msg)
+        document.getElementById("yoyo").value=''
+    }
+</script>
+<input type="text" id="yoyo" size="50">
+<button type="button" onclick="fun()">Send</button>
