@@ -20,5 +20,5 @@ from demo1.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('group/<str:grpname>',index)
+    path('group/<str:grpname>',index,name="Index")
 ]

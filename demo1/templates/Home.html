@@ -1,29 +1,99 @@
-<center><h1>ChatBox</h1></center>
-<textarea id="display" rows="20" cols="165" readonly></textarea><br><br>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    var ws = new WebSocket('ws://127.0.0.1:8000/wt/{{data}}')
+  </head>
+  <body>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        SignIn
+      </button>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">SignIn Form</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="post" action="{% url 'Index' data %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label>
+                        UserName:
+                        <br>
+                        <input type="text" name="username" required>
+                    </label>
+                    <br><br>
+                    <label>Password:  
+                        <br>
+                        <input type="password" name="password" required>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">SignIn</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+        <center><h1>ChatBox</h1></center>
+    <div id="display">
+        {% for chat in chats %}
+            {% if chat.user == request.user %}
+            <div class="p-3 ms-3" style="border-radius: 15px; background-color: rgba(57, 192, 237,.2);">
+                {{ chat.user }}: {{ chat.txt }}
+            </div>
+            {%else%}
+            <div class="chat-message left-message">
+                {{ chat.user }}: {{ chat.txt }}
+            </div>
+            {%endif%}
+        {% endfor %}
+    </div>
 
-    ws.onopen = function(){
-        console.log('this is connect')
-    }
+        <script>
 
-    ws.onmessage = function(event){
-        console.log('Message recived from ws', event)
-        document.getElementById('display').value += event.data +'\n'
-    }
-    ws.onerror = function(event){
-        console.log('Error is occured..', event)
-    }
-    ws.onclose = function(event){
-        console.log('Connection is closed..', event)
-    }
-    function fun() {
-        var msg= document.getElementById("yoyo").value;
-        ws.send(msg)
-        document.getElementById("yoyo").value=''
-    }
-</script>
-<input type="text" id="yoyo" size="50">
-<button type="button" onclick="fun()">Send</button>
+            var ws = new WebSocket('ws://127.0.0.1:8000/wt/{{data}}')
+
+            ws.onopen = function(){
+                console.log('this is connect')
+            }
+
+            ws.onmessage = function(event){
+                console.log('Message recived from ws', event)
+                // document.getElementById('display').value += event.data +'\n'
+                var element= <div class="chat-message left-message">
+                    event.data
+                </div>
+                document.getElementById('display').appendChild(element);
+            }
+            ws.onerror = function(event){
+                console.log('Error is occured..', event)
+            }
+            ws.onclose = function(event){
+                console.log('Connection is closed..', event)
+            }
+            function fun() {
+                var msg= document.getElementById("yoyo").value;
+                ws.send(msg)
+                document.getElementById("yoyo").value=''
+            }
+        </script>
+        {% if request.user.is_authenticated %}
+        <input type="text" id="yoyo" size="50">
+        <button type="button" onclick="fun()">Send</button>
+        {%endif%}
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
